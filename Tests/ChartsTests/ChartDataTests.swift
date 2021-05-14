@@ -64,4 +64,43 @@ class ChartDataTests: XCTestCase {
         XCTAssertTrue(data.dataSet(forLabel: SetLabels.badLabel, ignorecase: true) == nil)
         XCTAssertTrue(data.dataSet(forLabel: SetLabels.badLabel, ignorecase: false) == nil)
     }
+
+    func testXBoundsRange() {
+        let dataset = ScatterChartDataSet(entries: [
+            ChartDataEntry(x: 0.0, y: 2.0),
+            ChartDataEntry(x: 1.0, y: 2.0),
+            ChartDataEntry(x: 2.0, y: 2.0),
+        ])
+
+        let data = ScatterChartData(dataSet: dataset)
+
+        let scatterView = ScatterChartView()
+        scatterView.data = data
+        scatterView.xAxis.axisMinimum = 0.0
+        scatterView.xAxis.axisMaximum = 5.0
+
+        let xrange = BarLineScatterCandleBubbleRenderer.XBounds(chart: scatterView, dataSet: dataset, animator: nil)
+        print(xrange)
+        XCTAssertTrue(xrange.min == 0)
+        XCTAssertEqual(xrange.map { $0 }, [0, 1, 2])
+    }
+
+    func testXBoundsRangeOnEdge() {
+        let dataset = ScatterChartDataSet(entries: [
+            ChartDataEntry(x: 0.0, y: 2.0),
+            ChartDataEntry(x: 1.0, y: 2.0),
+            ChartDataEntry(x: 2.0, y: 2.0),
+        ])
+
+        let data = ScatterChartData(dataSet: dataset)
+
+        let scatterView = ScatterChartView()
+        scatterView.data = data
+        scatterView.xAxis.axisMinimum = 2.0
+        scatterView.xAxis.axisMaximum = 5.0
+
+        let xrange = BarLineScatterCandleBubbleRenderer.XBounds(chart: scatterView, dataSet: dataset, animator: nil)
+        XCTAssertTrue(xrange.min == 2)
+        XCTAssertEqual(xrange.map { $0 }, [2])
+    }
 }
